@@ -54,11 +54,9 @@ if 'logged_in' in st.session_state.keys():
         question = st.text_input('Ask your question')
         if question != '':
             st.write('I drink and I know things.')'''
-        
-
-    st.session_state.start_chat = True
-    thread = client.beta.threads.create()
-    st.session_state.thread_id = thread.id
+         st.session_state.start_chat = True
+         thread = client.beta.threads.create()
+         st.session_state.thread_id = thread.id
 
 st.title("Career and Business consultant Chatbot")
 st.write("I am Career and Business consultant chatbot")
