@@ -2,6 +2,7 @@ import streamlit as st
 from decouple import config
 from PIL import Image
 import json
+import os
 
 # Function to handle successful charge
 def handle_charge_success(event):
@@ -41,10 +42,10 @@ with st.form("login_form"):
     submitted = st.form_submit_button("Login")
 
 # Check if Stripe event received
-stripe_event = st.request.headers.get('Stripe-Signature')
-if stripe_event:
+stripe_event_json = os.getenv("STRIPE_EVENT")
+if stripe_event_json:
     try:
-        event = json.loads(st.request.body)
+        event = json.loads(stripe_event_json)
         handle_charge_success(event)
     except Exception as e:
         st.error(f"Error handling Stripe event: {e}")
