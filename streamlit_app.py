@@ -2,7 +2,6 @@ import streamlit as st
 from decouple import config
 from PIL import Image
 import openai
-import time
 
 # Configure OpenAI client
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -56,11 +55,9 @@ if 'logged_in' in st.session_state.keys():
             temperature=0.7
         )
 
-        st.session_state.thread_id = thread.id
-        messages = thread.messages
-
+        messages = thread["choices"][0]["message"]["content"]
         for message in messages:
-            if message.role == "user":
-                st.write(f"User: {message.content}")
-            elif message.role == "assistant":
-                st.write(f"Assistant: {message.content}")
+            if message["role"] == "user":
+                st.write(f"User: {message['content']}")
+            elif message["role"] == "assistant":
+                st.write(f"Assistant: {message['content']}")
