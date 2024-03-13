@@ -15,54 +15,57 @@ def handle_charge_succeeded(event):
     st.write("Payment successful! Thank you for your purchase.")
 
 # Listen for incoming webhook requests
-if st.request.method == 'POST':
-    payload = st.request.body.decode('utf-8')
-    event = json.loads(payload)
-    
-    if event['type'] == 'charge.succeeded':
-        handle_charge_succeeded(event)
-    else:
-        st.write(f"Received unsupported event type: {event['type']}")
+if st._is_running_with_streamlit:
+    endpoint = st.server.server_runner._generate_id()
+    webhook_url = f"{st.session_state.url}/{endpoint}"
 
-# Your existing Streamlit app code
-st.set_page_config(page_icon='🗡', page_title='Streamlit Paywall Example')
+    st.write(f"Webhook URL: {webhook_url}")
 
-st.markdown('## Chat with Tyrion Lannister ⚔️')
-col1, col2 = st.columns((2,1))
-with col1:
-    st.markdown(
-        f"""
-        Chat with Tyrion Lannister to advise you on:
-        - Office Politics
-        - War Strategy
-        - The Targaryens
+    # Your existing Streamlit app code
+    st.set_page_config(page_icon='🗡', page_title='Streamlit Paywall Example')
+
+    st.markdown('## Chat with Tyrion Lannister ⚔️')
+    col1, col2 = st.columns((2,1))
+    with col1:
+        st.markdown(
+            f"""
+            Chat with Tyrion Lannister to advise you on:
+            - Office Politics
+            - War Strategy
+            - The Targaryens
 
 
-        #### [Sign Up Now 🤘🏻]({config('STRIPE_CHECKOUT_LINK')})
-        """
-    )
-with col2:
-    image = Image.open('./assets/DALL·E 2023-01-08 17.53.04 - futuristic knight robot on a horse in cyberpunk theme.png')
-    st.image(image)
+            #### [Sign Up Now 🤘🏻]({config('STRIPE_CHECKOUT_LINK')})
+            """
+        )
+    with col2:
+        image = Image.open('./assets/DALL·E 2023-01-08 17.53.04 - futuristic knight robot on a horse in cyberpunk theme.png')
+        st.image(image)
 
-st.markdown('### Already have an Account? Login Below👇🏻')
-with st.form("login_form"):
-    st.write("Login")
-    email = st.text_input('Enter Your Email')
-    password = st.text_input('Enter Your Password')
-    submitted = st.form_submit_button("Login")
+    st.markdown('### Already have an Account? Login Below👇🏻')
+    with st.form("login_form"):
+        st.write("Login")
+        email = st.text_input('Enter Your Email')
+        password = st.text_input('Enter Your Password')
+        submitted = st.form_submit_button("Login")
 
-if 'logged_in' in st.session_state.keys() and not st.session_state['logged_in']:
-    if submitted and password == config('SECRET_PASSWORD'):
-        st.session_state['logged_in'] = True
-        st.text('Successfully Logged In!')
-    else:
-        st.text('Incorrect login credentials.')
-        st.session_state['logged_in'] = False
+    if 'logged_in' in st.session_state.keys() and not st.session_state['logged_in']:
+        if submitted and password == config('SECRET_PASSWORD'):
+            st.session_state['logged_in'] = True
+            st.text('Successfully Logged In!')
+        else:
+            st.text('Incorrect login credentials.')
+            st.session_state['logged_in'] = False
 
-if 'logged_in' in st.session_state.keys() and st.session_state['logged_in']:
-    st.markdown('## Ask Me Anything')
-    question = st.text_input('Ask your question')
-    if question != '':
-        st.write('I drink and I know things.')
+    if 'logged_in' in st.session_state.keys() and st.session_state['logged_in']:
+        st.markdown('## Ask Me Anything')
+        question = st.text_input('Ask your question')
+        if question != '':
+            st.write('I drink and I know things.')
 
+    # Code to handle incoming webhook requests
+    payload = st.experimental_request_queue.RerunData_pb.RequestQueueGetRequest()
+    if payload is not None:
+        event = json.loads(payload)
+        if event['type'] == 'charge.succeeded':
+            handle_charge_succeeded(event)
