@@ -45,6 +45,7 @@ with st.form("login_form"):
 stripe_event_json = os.getenv("STRIPE_EVENT")
 if stripe_event_json:
     try:
+        st.write("Stripe Event Payload:", stripe_event_json)  # Print the entire Stripe event payload
         event = json.loads(stripe_event_json)
         handle_charge_success(event)
     except Exception as e:
