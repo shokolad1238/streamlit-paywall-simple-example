@@ -1,17 +1,25 @@
 import streamlit as st
-from decouple import config
-from PIL import Image
 import json
-import os
 
-# Function to handle successful charge
-def handle_charge_success(event):
-    charge = event['data']['object']
-    # Extract relevant payment information and update your app accordingly
-    # For example, you can store the payment status in your database or display a success message to the user
+# Function to handle charge succeeded event
+def handle_charge_succeeded(event):
+    charge_id = event['data']['object']['id']
+    amount = event['data']['object']['amount']
+    currency = event['data']['object']['currency']
+    # Add your logic to update the app based on the charge details
+    st.write(f"Charge ID: {charge_id}")
+    st.write(f"Amount: {amount / 100} {currency}")  # Assuming amount is in cents, convert to dollars
     st.write("Payment successful! Thank you for your purchase.")
-    # Initiate session
-    st.session_state['logged_in'] = True
+
+# Listen for incoming webhook requests
+if st.request.method == 'POST':
+    payload = st.request.body.decode('utf-8')
+    event = json.loads(payload)
+    
+    if event['type'] == 'charge.succeeded':
+        handle_charge_succeeded(event)
+    else:
+        st.write(f"Received unsupported event type: {event['type']}")
 
 # Your existing Streamlit app code
 st.set_page_config(page_icon='🗡', page_title='Streamlit Paywall Example')
@@ -40,16 +48,6 @@ with st.form("login_form"):
     email = st.text_input('Enter Your Email')
     password = st.text_input('Enter Your Password')
     submitted = st.form_submit_button("Login")
-
-# Check if Stripe event received
-stripe_event_json = os.getenv("STRIPE_EVENT")
-if stripe_event_json:
-    try:
-        st.write("Stripe Event Payload:", stripe_event_json)  # Print the entire Stripe event payload
-        event = json.loads(stripe_event_json)
-        handle_charge_success(event)
-    except Exception as e:
-        st.error(f"Error handling Stripe event: {e}")
 
 if 'logged_in' in st.session_state.keys() and not st.session_state['logged_in']:
     if submitted and password == config('SECRET_PASSWORD'):
