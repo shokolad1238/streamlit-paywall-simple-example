@@ -1,5 +1,8 @@
 import streamlit as st
+from decouple import config
+from PIL import Image
 import json
+import os
 
 # Function to handle charge succeeded event
 def handle_charge_succeeded(event):
