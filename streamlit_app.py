@@ -63,10 +63,10 @@ if 'logged_in' in st.session_state.keys():
 st.title("Career and Business consultant Chatbot")
 st.write("I am Career and Business consultant chatbot")
 
-if st.button("Exit Chat"):
+'''if st.button("Exit Chat"):
     st.session_state.messages = []  # Clear the chat history
     st.session_state.start_chat = False  # Reset the chat state
-    st.session_state.thread_id = None
+    st.session_state.thread_id = None'''
 
 if st.session_state.start_chat:
     if "openai_model" not in st.session_state:
@@ -115,5 +115,5 @@ if st.session_state.start_chat:
             with st.chat_message("assistant"):
                 st.markdown(message.content[0].text.value)
 
-else:
-    st.write("Click 'Start Chat' to begin.")
+'''else:
+    st.write("Click 'Start Chat' to begin.")'''
